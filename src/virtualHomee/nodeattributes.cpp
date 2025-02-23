@@ -23,6 +23,13 @@ void nodeAttributes::GetJSONObject(JsonObject doc)
     doc["name"] = this->name;
 }
 
+void nodeAttributes::setName(String s)
+{
+  this->name = s;
+
+  return;  
+}
+
 double_t nodeAttributes::getMinimumValue()
 {
     return this->minimum;
