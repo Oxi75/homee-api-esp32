@@ -99,6 +99,9 @@ String virtualHomee::getUrlParameterValue(const String& url, const String& param
     }
 }
 
+
+//24.2.2025: Ist das ok, dass die ID über alle Nodes hinweg nur einmal vorkommen darf?
+//wäre es nicht logischer, wenn der Aufruf ::getAttributsById(uint32_t nodeID, uint32_t attrID) lauten würde?
 nodeAttributes* virtualHomee::getAttributeById(uint32_t _id)
 {
     for(int i = 0; i < this->nds.GetNumberOfNodes(); i++)
@@ -171,8 +174,14 @@ void virtualHomee::initializeWebsocketServer()
             AwsFrameInfo *info = (AwsFrameInfo *)arg;
             if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT)
             {
-                data[len] = 0;
-                String message = (char *)data;
+		char* msg = new char[len + 1];
+		memcpy(msg, data, len);
+		msg[len] = '\0';
+		String message = msg;
+		delete[] msg;
+
+//                data[len] = 0;
+//                String message = (char *)data;
 #ifdef DEBUG_VIRTUAL_HOMEE
                 Serial.print("DEBUG: Received Message: ");
                 Serial.println(message);
@@ -296,7 +305,11 @@ void virtualHomee::stop()
     ws.cleanupClients();
     //Stop Services
     server.end();
-    //this->stopDiscoveryService();
+    
+    // Handle UDP properly if it's listening
+    if (udp.connected()) {
+        udp.close();
+    }    
 }
 
 void virtualHomee::startDiscoveryService()
@@ -323,10 +336,6 @@ void virtualHomee::startDiscoveryService()
     }
 }
 
-//void virtualHomee::stopDiscoveryService()
-//{
-//    udp.close();
-//}
 
 void virtualHomee::updateAttributeValue(nodeAttributes *_attribute, double _value)
 {
