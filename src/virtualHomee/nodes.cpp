@@ -60,7 +60,11 @@ nodes::nodes()
 
 nodes::~nodes()
 {
-    
+    for(auto* node : n)
+    {
+        delete node;
+    }
+    n.clear();
 }
 
 void nodes::RemoveNodeById(int32_t nodeId)

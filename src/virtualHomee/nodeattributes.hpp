@@ -34,6 +34,7 @@ class nodeAttributes
 
         void executeCallback();
         
+        void setName(String s);
         void setId(uint32_t _id);
         uint32_t getId();
         void setNodeId(uint32_t _node_id);

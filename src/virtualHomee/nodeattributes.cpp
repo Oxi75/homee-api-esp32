@@ -23,6 +23,13 @@ void nodeAttributes::GetJSONObject(JsonObject doc)
     doc["name"] = this->name;
 }
 
+void nodeAttributes::setName(String s)
+{
+  this->name = s;
+
+  return;  
+}
+
 double_t nodeAttributes::getMinimumValue()
 {
     return this->minimum;
@@ -101,7 +108,7 @@ uint32_t nodeAttributes::getNodeId()
 
 uint32_t nodeAttributes::getTimestamp()
 {
-    time_t now = time(&now);
+    time_t now;
     return time(&now);
 }
 
