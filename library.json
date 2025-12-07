@@ -1,7 +1,7 @@
 {
     "name": "homee-api-esp32",
-    "version": "0.2.7",
-    "description": "A \"Hello world\" program is a computer program that outputs \"Hello World\" (or some variant) on a display device",
+    "version": "0.3.0",
+    "description": "Virtual homee API for ESP32/ESP8266",
     "keywords": "homee, vhih, virtual homee",
     "build":
     {
@@ -28,15 +28,23 @@
       {
         "owner": "bblanchon",
         "name": "ArduinoJson",
-        "version": "^6.17.3"
+        "version": "^7.3.0"
       },
       {
+        "owner": "mathieucarbou",
         "name": "ESPAsyncWebServer",
-        "version": "https://github.com/DanielKnoop/ESPAsyncWebServer.git#1.2.7"
+        "version": "^3.7.0"
       },
       {
-        "name": "ESPAsyncUDP",
-        "version": "https://github.com/DanielKnoop/ESPAsyncUDP.git",
+        "owner": "mathieucarbou",
+        "name": "AsyncTCP",
+        "version": "^3.3.2",
+        "platforms": ["espressif32"]
+      },
+      {
+        "owner": "mathieucarbou",
+        "name": "ESPAsyncTCP",
+        "version": "^3.1.5",
         "platforms": ["espressif8266"]
       }
     ],
