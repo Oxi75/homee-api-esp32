@@ -28,17 +28,17 @@
       {
         "owner": "bblanchon",
         "name": "ArduinoJson",
-        "version": "^7.3.0"
+        "version": "^7.3.1"
       },
       {
         "owner": "mathieucarbou",
         "name": "ESPAsyncWebServer",
-        "version": "^3.7.0"
+        "version": "^3.7.2"
       },
       {
         "owner": "mathieucarbou",
         "name": "AsyncTCP",
-        "version": "^3.3.2",
+        "version": "^3.3.6",
         "platforms": ["espressif32"]
       },
       {
