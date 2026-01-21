@@ -381,7 +381,7 @@ virtualHomee::virtualHomee()
     String mac = WiFi.macAddress();
     mac.replace(":", "");
     this->homeeId = mac;
-    this->version = "2.25.0 (ed9c50)";
+    this->version = "2.41.3+46ad073c";
     this->nds.AddNode(new node(-1, 1, "homee"));
 
     initializeWebServer();
