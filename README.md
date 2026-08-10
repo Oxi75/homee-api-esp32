@@ -11,13 +11,14 @@ Zunächst in es notwendig, die homee-Api zu erstellen (den virtualHomee).
 
 ```cpp
 #include "virtualHomee.hpp"
+#include "virtualHomee/homee_defines.h"
 virtualHomee vhih;
 ```
 
 Diesem virtualHomee müssen Nodes hinzugefügt werden (Vorzugsweise im Bereich Setup).
 
 ```cpp
-node* n1 = new node(10, 3001, "Luftsensor");
+node* n1 = new node(10, CANodeProfileTemperatureAndHumiditySensor, "Luftsensor");
 vhih.addNode(n1);
 ```
 Der Konstruktor vom Node nimmt dabei folgende Attribute entgegen: NodeId, Profile, Name
@@ -25,7 +26,7 @@ Der Konstruktor vom Node nimmt dabei folgende Attribute entgegen: NodeId, Profil
 Diesem Node müssen noch Attribute zugeordnet werden. 
 
 ```cpp
-    na1 = n1->AddAttributes(new nodeAttributes(5));
+    na1 = n1->AddAttributes(new nodeAttributes(CAAttributeTypeTemperature));
     na1->setUnit("°C");
     na1->setMinimumValue(-20);
     na1->setMaximumValue(60);
@@ -60,8 +61,8 @@ Es ist auch möglich, Werte vom homee zu empfangen. Hierzu kann dem Attribute ei
 ```cpp
 void setup()
 {
-  node* n2 = new node(20, 10, "Schalter");
-  schalterAttribute = n2->AddAttributes(new nodeAttributes(1));
+  node* n2 = new node(20, CANodeProfileOnOffPlug, "Schalter");
+  schalterAttribute = n2->AddAttributes(new nodeAttributes(CAAttributeTypeOnOff));
   schalterAttribute->setEditable(1);
   schalterAttribute->setMinimumValue(0);
   schalterAttribute->setMaximumValue(1);
@@ -86,16 +87,33 @@ Die Library ist für ESP8266 und ESP32 Boards ausgelegt.
 
 ### ESP8266
 Folgende Abhängigkeiten benötigt der ESP8266
-* ArduinoJson 6.17.3 (bblanchon)
-* ESPAsyncWebServer 1.2.7 (https://github.com/DanielKnoop/ESPAsyncWebServer)
-    * ESPAsyncTCP 1.2.2 (me-no-dev)
+* ArduinoJson ^7.3.1 (bblanchon)
+* ESPAsyncWebServer ^3.7.2 (ESP32Async)
+    * ESPAsyncTCP ^3.1.5 (ESP32Async)
 * ESPAsyncUDP (https://github.com/DanielKnoop/ESPAsyncUDP)
 
 ### ESP32
 Folgende Abhängigkeiten benötigt der ESP32
-* ArduinoJson >= 6.17.3 (Gibt es über die Paketverwaltung)
-* ESPAsyncWebServer >= 1.2.7 (https://github.com/DanielKnoop/ESPAsyncWebServer)
-    * AsyncTCP 1.1.1 (me-no-dev)
+* ArduinoJson ^7.3.1 (bblanchon, über die Paketverwaltung)
+* ESPAsyncWebServer ^3.7.2 (ESP32Async)
+    * AsyncTCP ^3.3.6 (ESP32Async)
+
+## Node-Profile, Attribut-Typen und Icons
+
+Für die `profile`- und `type`-Parameter von `node` und `nodeAttributes` sowie für `node::setImage()` müssen normalerweise die von homee definierten numerischen IDs bzw. Icon-Strings von Hand nachgeschlagen werden. Die Library liefert dafür zwei Header mit fertigen Konstanten:
+
+* `src/virtualHomee/homee_defines.h` — Enums `CANodeProfile...` (Node-Profile) und `CAAttributeType...` (Attribut-Typen), 1:1 aus dem offiziellen [homee-api](https://github.com/stfnhmplr/homee-api) JS-SDK übernommen.
+* `src/virtualHomee/homee_icons.h` — `NodeIcon...`-Konstanten für den `image`-Parameter von `node::setImage()`, inoffiziell aus Beobachtungen der homee-App zusammengetragen.
+
+```cpp
+#include "virtualHomee/homee_defines.h"
+#include "virtualHomee/homee_icons.h"
+
+node* n1 = new node(10, CANodeProfileTemperatureAndHumiditySensor, "Luftsensor");
+n1->setImage(NodeIconTemperature);
+```
+
+Details zu Herkunft und Lizenz stehen als Kommentar am Anfang der jeweiligen Datei.
 
 ## Hinweise
 

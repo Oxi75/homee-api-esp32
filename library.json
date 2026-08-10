@@ -1,6 +1,6 @@
 {
     "name": "homee-api-esp32",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "description": "Virtual homee API for ESP32/ESP8266",
     "keywords": "homee, vhih, virtual homee",
     "build":
