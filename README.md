@@ -4,6 +4,8 @@ Hierdurch ist es möglich, Sensoren und Aktoren auf Basis eines ESP32 und ESP826
 
 Ein Beispiel ist hier verfügbar: https://github.com/DanielKnoop/homee-co2-sensor
 
+Weitere, aktuellere Beispiele gibt es u. a. hier: https://github.com/Oxi75/Vhih_ESP32_examples
+
 Die API gliedert sich im Kern in drei Teile.
 Das API Objekt selbst, Nodes und Attributes.
 
@@ -86,6 +88,8 @@ Um den Sensor zum homee hinzuzufügen sucht man in der homee-app unter Geräte h
 Die Library ist für ESP8266 und ESP32 Boards ausgelegt.
 
 ### ESP8266
+> ⚠️ **Hinweis:** Die Migration auf ArduinoJson v7 und den ESP32Async-Fork von ESPAsyncWebServer/AsyncTCP (seit 0.4.0) wurde bisher ausschließlich auf ESP32 getestet. Die ESP8266-Unterstützung ist seitdem ungetestet und möglicherweise nicht funktionsfähig.
+
 Folgende Abhängigkeiten benötigt der ESP8266
 * ArduinoJson ^7.3.1 (bblanchon)
 * ESPAsyncWebServer ^3.7.2 (ESP32Async)

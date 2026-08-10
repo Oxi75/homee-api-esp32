@@ -36,6 +36,12 @@ statt jeden einzelnen Commit aufzuführen.
   (u. a. Umgang mit sich überlappenden Attribut-IDs, WebSocket-Server
   Start/Stop-Verhalten).
 
+### Known Issues
+- Die Migration auf ArduinoJson v7 und den ESP32Async-Fork von
+  ESPAsyncWebServer/AsyncTCP wurde bisher ausschließlich auf ESP32 getestet.
+  Die ESP8266-Unterstützung ist seitdem ungetestet und möglicherweise nicht
+  funktionsfähig.
+
 ## Vor 0.4.0
 
 Vor diesem Release wurde nie ein Git-Tag oder GitHub-Release erstellt; der Stand der
