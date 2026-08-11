@@ -1,10 +1,17 @@
 # homee-api
-Dieses Projekt ist eine Möglichkeit, das Smarthome-System homee mit einem ESP32 Controller zu verbinden.
-Hierdurch ist es möglich, Sensoren und Aktoren auf Basis eines ESP32 und ESP8266 zu erstellen.
+Dieses Projekt bietet die Möglichkeit, das Smarthome-System homee mit einem ESP32 / ESP8266 Controller zu verbinden.
+Es basiert auf dem ursprünglichen Projekt von Daniel Knoop in der Version 0.2.7 (https://github.com/DanielKnoop/homee-api-esp32/tree/c4b5c123364566e4ccfca667581b4595b9305d7e) und wurde in einigen Punkten aktualisiert (neue Libraries) und leicht erweitert. Dazu kam u.a. Claude Code zum Einsatz.
 
-Ein Beispiel ist hier verfügbar: https://github.com/DanielKnoop/homee-co2-sensor
+> ⚠️ **Hinweis:** Die ESP8266-Version ist in der aktuellen Fassung **NICHT getestet**!
 
-Weitere, aktuellere Beispiele gibt es u. a. hier: https://github.com/Oxi75/Vhih_ESP32_examples
+Mit Hilfe der Lib ist es daher möglich selbst entwickelte Sensoren und Sensorsysteme an homee anzubinden.
+Verschiedene generische Beispiele finden sich in den Branches dieses Projektes: https://github.com/Oxi75/Vhih_ESP32_examples
+
+Außerdem wurden z.B. folgende Projekte damit umgesetzt:
+Fußbodenheizungssteuerung: https://github.com/Oxi75/floorHeatingController
+EV1527 basierender Fenstersensor: https://github.com/Oxi75/WindowSensor_EV1527
+Erweiterung eine Velux-Fernbedienung: https://github.com/Oxi75/VELUX_RemoteCtrl
+
 
 Die API gliedert sich im Kern in drei Teile.
 Das API Objekt selbst, Nodes und Attributes.
@@ -13,14 +20,16 @@ Zunächst in es notwendig, die homee-Api zu erstellen (den virtualHomee).
 
 ```cpp
 #include "virtualHomee.hpp"
-#include "virtualHomee/homee_defines.h"
+#include "virtualHomee/homee_defines.h"  // optional: Enums für Profile/Attribut-Typen
+#include "virtualHomee/homee_icons.h"    // optional: Konstanten für node::setImage()
 virtualHomee vhih;
 ```
 
 Diesem virtualHomee müssen Nodes hinzugefügt werden (Vorzugsweise im Bereich Setup).
 
 ```cpp
-node* n1 = new node(10, CANodeProfileTemperatureAndHumiditySensor, "Luftsensor");
+node* n1 = new node(10, CANodeProfileTemperatureAndHumiditySensor, "Luftsensor"); // optional, entspricht der Zahl 3001
+n1->setImage(NodeIconTemperature); // optional, entspricht dem String "nodeicon_temperature"
 vhih.addNode(n1);
 ```
 Der Konstruktor vom Node nimmt dabei folgende Attribute entgegen: NodeId, Profile, Name
@@ -28,7 +37,7 @@ Der Konstruktor vom Node nimmt dabei folgende Attribute entgegen: NodeId, Profil
 Diesem Node müssen noch Attribute zugeordnet werden. 
 
 ```cpp
-    na1 = n1->AddAttributes(new nodeAttributes(CAAttributeTypeTemperature));
+    na1 = n1->AddAttributes(new nodeAttributes(CAAttributeTypeTemperature)); // optional, entspricht der Zahl 5
     na1->setUnit("°C");
     na1->setMinimumValue(-20);
     na1->setMaximumValue(60);
@@ -88,8 +97,6 @@ Um den Sensor zum homee hinzuzufügen sucht man in der homee-app unter Geräte h
 Die Library ist für ESP8266 und ESP32 Boards ausgelegt.
 
 ### ESP8266
-> ⚠️ **Hinweis:** Die Migration auf ArduinoJson v7 und den ESP32Async-Fork von ESPAsyncWebServer/AsyncTCP (seit 0.4.0) wurde bisher ausschließlich auf ESP32 getestet. Die ESP8266-Unterstützung ist seitdem ungetestet und möglicherweise nicht funktionsfähig.
-
 Folgende Abhängigkeiten benötigt der ESP8266
 * ArduinoJson ^7.3.1 (bblanchon)
 * ESPAsyncWebServer ^3.7.2 (ESP32Async)
@@ -102,22 +109,6 @@ Folgende Abhängigkeiten benötigt der ESP32
 * ESPAsyncWebServer ^3.7.2 (ESP32Async)
     * AsyncTCP ^3.3.6 (ESP32Async)
 
-## Node-Profile, Attribut-Typen und Icons
-
-Für die `profile`- und `type`-Parameter von `node` und `nodeAttributes` sowie für `node::setImage()` müssen normalerweise die von homee definierten numerischen IDs bzw. Icon-Strings von Hand nachgeschlagen werden. Die Library liefert dafür zwei Header mit fertigen Konstanten:
-
-* `src/virtualHomee/homee_defines.h` — Enums `CANodeProfile...` (Node-Profile) und `CAAttributeType...` (Attribut-Typen), 1:1 aus dem offiziellen [homee-api](https://github.com/stfnhmplr/homee-api) JS-SDK übernommen.
-* `src/virtualHomee/homee_icons.h` — `NodeIcon...`-Konstanten für den `image`-Parameter von `node::setImage()`, inoffiziell aus Beobachtungen der homee-App zusammengetragen.
-
-```cpp
-#include "virtualHomee/homee_defines.h"
-#include "virtualHomee/homee_icons.h"
-
-node* n1 = new node(10, CANodeProfileTemperatureAndHumiditySensor, "Luftsensor");
-n1->setImage(NodeIconTemperature);
-```
-
-Details zu Herkunft und Lizenz stehen als Kommentar am Anfang der jeweiligen Datei.
 
 ## Hinweise
 
