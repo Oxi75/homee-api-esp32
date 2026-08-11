@@ -4,6 +4,8 @@ Es basiert auf dem ursprünglichen Projekt von Daniel Knoop in der Version 0.2.7
 
 > ⚠️ **Hinweis:** Die ESP8266-Version ist in der aktuellen Fassung **NICHT getestet**!
 
+> ℹ️ **Zur Versionsnummer:** Dieser Fork springt bewusst auf `10.1.0`, statt die ursprüngliche 0.x-Zählung fortzuführen. Der große Sprung dient ausschließlich dazu, ausreichend Abstand zur Versionsnummer des Original-Projekts zu schaffen und Verwechslungen zu vermeiden (Daniel Knoops Original läuft unabhängig davon weiter und trägt zeitweise dieselben 0.x-Nummern). Die Zahl **10** ist **kein** Hinweis auf Reife, Stabilität oder Funktionsumfang dieser Library.
+
 Mit Hilfe der Lib ist es daher möglich selbst entwickelte Sensoren und Sensorsysteme an homee anzubinden.
 Verschiedene generische Beispiele finden sich in den Branches dieses Projektes: https://github.com/Oxi75/Vhih_ESP32_examples
 
