@@ -47,8 +47,9 @@
 // separate homee_icons.h - different provenance (reverse-engineered from
 // the web app, not part of the official SDK enums converted below).
 
-enum CANodeProfile : uint16_t
+enum CANodeProfile : uint32_t
 {
+    CANodeProfileUnknown = 0xFFFFFFFF,
     CANodeProfileNone = 0,
     CANodeProfileHomee = 1,
     CANodeProfileOnOffPlug = 10,
