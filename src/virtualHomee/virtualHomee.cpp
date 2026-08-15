@@ -24,7 +24,10 @@ void virtualHomee::getSettings(JsonObject jsonDoc)
     jsonDoc["settings"]["wlan_mode"] = 2;
     jsonDoc["settings"]["online"] = 0;
     jsonDoc["settings"]["lan_enabled"] = 1;
-    jsonDoc["settings"].createNestedArray("available_ssids").add("homeeWifi");
+    
+    // V7 Syntax: Array erstellen und hinzufügen
+    jsonDoc["settings"]["available_ssids"].to<JsonArray>().add("homeeWifi");
+    
     jsonDoc["settings"]["time"] = 1562707105;
     jsonDoc["settings"]["civil_time"] = F("2019-07-09 23:18:25");
     jsonDoc["settings"]["version"] = this->version;
@@ -33,8 +36,9 @@ void virtualHomee::getSettings(JsonObject jsonDoc)
     jsonDoc["settings"]["local_ssl_enabled"] = false;
     jsonDoc["settings"]["b2b_partner"] = F("homee");
     jsonDoc["settings"]["homee_name"] = this->homeeId;
-    jsonDoc["settings"].createNestedArray("cubes");
-
+    
+    // Leeres Array erstellen
+    jsonDoc["settings"]["cubes"].to<JsonArray>();
 }
 
 void virtualHomee::addNode(node *n)
@@ -65,23 +69,29 @@ nodeAttributes *virtualHomee::getAttributeWithId(uint32_t id)
 void virtualHomee::updateAttribute(nodeAttributes *_nodeAttribute)
 {
     ws.cleanupClients();
-    AsyncWebSocketJsonBuffer* buffer = ws.makeJsonBuffer(false, _nodeAttribute->size());
-    JsonVariant doc = buffer->getRoot();
-    JsonObject attribute = doc.createNestedObject("attribute");
+    
+    // Neu für ArduinoJson 7:
+    JsonDocument doc;
+    JsonObject attribute = doc["attribute"].to<JsonObject>();
     _nodeAttribute->GetJSONObject(attribute);
-    buffer->setLength();
-    ws.textAll(buffer);
+    
+    String output;
+    serializeJson(doc, output);
+    ws.textAll(output);
 }
 
 void virtualHomee::updateNode(node* _node)
 {
     ws.cleanupClients();
-    AsyncWebSocketJsonBuffer* buffer = ws.makeJsonBuffer(false, _node->size());
-    JsonVariant doc = buffer->getRoot();
-    JsonObject node = doc.createNestedObject("node");
+    
+    // Neu für ArduinoJson 7:
+    JsonDocument doc;
+    JsonObject node = doc["node"].to<JsonObject>();
     _node->AddJSONObject(node);
-    buffer->setLength();
-    ws.textAll(buffer);
+    
+    String output;
+    serializeJson(doc, output);
+    ws.textAll(output);
 }
 
 String virtualHomee::getUrlParameterValue(const String& url, const String& parameterName)
@@ -99,9 +109,6 @@ String virtualHomee::getUrlParameterValue(const String& url, const String& param
     }
 }
 
-
-//24.2.2025: Ist das ok, dass die ID über alle Nodes hinweg nur einmal vorkommen darf?
-//wäre es nicht logischer, wenn der Aufruf ::getAttributsById(uint32_t nodeID, uint32_t attrID) lauten würde?
 nodeAttributes* virtualHomee::getAttributeById(uint32_t _id)
 {
     for(int i = 0; i < this->nds.GetNumberOfNodes(); i++)
@@ -144,6 +151,7 @@ void virtualHomee::initializeWebServer()
     server.on("/access_token", HTTP_DELETE, [](AsyncWebServerRequest *request) {});
     server.on("/access_token", HTTP_POST, [this](AsyncWebServerRequest *request){handleHttpPostRequest(this, request);});
 }
+
 void virtualHomee::initializeWebsocketServer()
 {
     ws.onEvent([this](AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len)
@@ -174,118 +182,99 @@ void virtualHomee::initializeWebsocketServer()
             AwsFrameInfo *info = (AwsFrameInfo *)arg;
             if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT)
             {
-		char* msg = new char[len + 1];
-		memcpy(msg, data, len);
-		msg[len] = '\0';
-		String message = msg;
-		delete[] msg;
+                char* msg = new char[len + 1];
+                memcpy(msg, data, len);
+                msg[len] = '\0';
+                String message = msg;
+                delete[] msg;
 
-//                data[len] = 0;
-//                String message = (char *)data;
 #ifdef DEBUG_VIRTUAL_HOMEE
                 Serial.print("DEBUG: Received Message: ");
                 Serial.println(message);
 #endif
                 if (message.equalsIgnoreCase("GET:Settings"))
                 {                 
-                    AsyncWebSocketJsonBuffer * jsonBuffer = ws.makeJsonBuffer();
-                    JsonVariant doc = jsonBuffer->getRoot();
-                    this->getSettings(doc);
-
-                    this->sendWSMessage(jsonBuffer, client);
-                    
+                    JsonDocument doc;
+                    JsonObject root = doc.to<JsonObject>();
+                    this->getSettings(root);
+                    this->sendWSMessage(doc, client);
                 }
                 else if (message.equalsIgnoreCase("GET:nodes"))
                 {
-#ifdef DEBUG_VIRTUAL_HOMEE
-                    Serial.print("DEBUG: Reserve Json Buffer Size: ");
-                    Serial.println(nds.size());
-#endif   
-                    AsyncWebSocketJsonBuffer * jsonBuffer = ws.makeJsonBuffer(false, nds.size());
-                    JsonVariant doc = jsonBuffer->getRoot();
-
-                    nds.GetJSONArray(doc.createNestedArray("nodes"));
-                    this->sendWSMessage(jsonBuffer, client);
+                    JsonDocument doc;
+                    JsonArray arr = doc["nodes"].to<JsonArray>();
+                    nds.GetJSONArray(arr);
+                    this->sendWSMessage(doc, client);
                 }
-                else if (message.substring(0, 9).equalsIgnoreCase("PUT:nodes")) //PUT:nodes/0/attributes?IDs=200&target_value=0.000000
+                else if (message.substring(0, 9).equalsIgnoreCase("PUT:nodes")) 
                 {
                     int32_t attributeId = this->getUrlParameterValue(message, "IDs").toInt();
                     double_t targetValue = this->getUrlParameterValue(message, "target_value").toDouble();
-#ifdef DEBUG_VIRTUAL_HOMEE
-                    Serial.print("Attribute ID: ");
-                    Serial.println(attributeId);
 
-                    Serial.print("Target Value: ");
-                    Serial.println(targetValue);
-#endif
                     nodeAttributes *changedNode = this->getAttributeWithId(attributeId);
                     if (changedNode != nullptr)
                     {
                         changedNode->setTargetValue(targetValue);
                         changedNode->executeCallback();
                     }
-#ifdef DEBUG_VIRTUAL_HOMEE
-                    else
-                    {
-                        Serial.println("Achtung: Node nicht gefunden");
-                    }
-#endif
                 }
-                else if (message.substring(0, 10).equalsIgnoreCase("POST:nodes")) //"POST:nodes?protocol=21&compatibility_check=1&my_version=2.32.0+eb5e9b1a
+                else if (message.substring(0, 10).equalsIgnoreCase("POST:nodes")) 
                 {
                     if (message.indexOf("compatibility_check=1") >= 0)
                     {
-                        AsyncWebSocketJsonBuffer * jsonBuffer = ws.makeJsonBuffer(false, 200);
-                        JsonVariant jsonDoc = jsonBuffer->getRoot();
-                        jsonDoc["compatibility_check"]["compatible"] = true;
-                        jsonDoc["compatibility_check"]["account"] = true;
-                        jsonDoc["compatibility_check"]["external_homee_status"] = F("none");
-                        jsonDoc["compatibility_check"]["your_version"] = true;
-                        jsonDoc["compatibility_check"]["my_version"] = this->version;
-                        jsonDoc["compatibility_check"]["my_homeeID"] = this->homeeId;
+                        JsonDocument jsonDoc;
+                        JsonObject root = jsonDoc["compatibility_check"].to<JsonObject>();
+                        root["compatible"] = true;
+                        root["account"] = true;
+                        root["external_homee_status"] = F("none");
+                        root["your_version"] = true;
+                        root["my_version"] = this->version;
+                        root["my_homeeID"] = this->homeeId;
 
-                        this->sendWSMessage(jsonBuffer, client);
+                        this->sendWSMessage(jsonDoc, client);
                     }
                     else if (message.indexOf("start_pairing=1") >= 0)
                     {
-                        AsyncWebSocketJsonBuffer * jsonBuffer = ws.makeJsonBuffer(false, 200);
-                        JsonVariant jsonDoc = jsonBuffer->getRoot();
-                        jsonDoc["pairing"]["access_token"] = this->access_token;
-                        jsonDoc["pairing"]["expires"] = 315360000;
-                        jsonDoc["pairing"]["userID"] = 1;
-                        jsonDoc["pairing"]["deviceID"] = 1;
+                        JsonDocument jsonDoc;
+                        JsonObject root = jsonDoc["pairing"].to<JsonObject>();
+                        root["access_token"] = this->access_token;
+                        root["expires"] = 315360000;
+                        root["userID"] = 1;
+                        root["deviceID"] = 1;
 
-                        this->sendWSMessage(jsonBuffer, client);
+                        this->sendWSMessage(jsonDoc, client);
                     }
                 }
                 else if (message == "DELETE:users/1/devices/1")
                 {
-                    AsyncWebSocketJsonBuffer * jsonBuffer = ws.makeJsonBuffer(false, 150);
-                    JsonVariant jsonDoc = jsonBuffer->getRoot();
-                    jsonDoc["warning"]["code"] = 600;
-                    jsonDoc["warning"]["description"] = F("Your device got removed.");
-                    jsonDoc["warning"]["message"] = F("You have been logged out.");
-                    jsonDoc["warning"]["data"] = serialized("{}");
-                    this->sendWSMessage(jsonBuffer, client);
+                    JsonDocument jsonDoc;
+                    JsonObject root = jsonDoc["warning"].to<JsonObject>();
+                    root["code"] = 600;
+                    root["description"] = F("Your device got removed.");
+                    root["message"] = F("You have been logged out.");
+                    root["data"] = "{}";
+                    this->sendWSMessage(jsonDoc, client);
                     client->close(4444, "DEVICE_DISCONNECT");
                 }
             }
         }
         ws.cleanupClients();
     });
-
 }
 
-void virtualHomee::sendWSMessage(AsyncWebSocketJsonBuffer * jsonBuffer, AsyncWebSocketClient *client)
+// Angepasste Sende-Funktion für ArduinoJson 7
+void virtualHomee::sendWSMessage(JsonDocument& doc, AsyncWebSocketClient *client)
 { 
+    String output;
+    serializeJson(doc, output);
+
 #ifdef DEBUG_VIRTUAL_HOMEE
-    Serial.print("DEBUG: Send Message: ");
-    Serial.println(measureJson(jsonBuffer->getRoot()));
-    //serializeJsonPretty(jsonBuffer->getRoot(), Serial);
-    Serial.println();
+    Serial.print("DEBUG: Send Message Size: ");
+    Serial.println(output.length());
 #endif
-    jsonBuffer->setLength();
-    client->text(jsonBuffer);
+    
+    // Senden des Strings direkt an den Client
+    client->text(output);
 }
 
 void virtualHomee::start()
@@ -335,7 +324,6 @@ void virtualHomee::startDiscoveryService()
         });
     }
 }
-
 
 void virtualHomee::updateAttributeValue(nodeAttributes *_attribute, double _value)
 {
@@ -393,7 +381,7 @@ virtualHomee::virtualHomee()
     String mac = WiFi.macAddress();
     mac.replace(":", "");
     this->homeeId = mac;
-    this->version = "2.25.0 (ed9c50)";
+    this->version = "2.41.2+0fd65df2";
     this->nds.AddNode(new node(-1, 1, "homee"));
 
     initializeWebServer();

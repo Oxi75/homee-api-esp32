@@ -1,7 +1,7 @@
 {
     "name": "homee-api-esp32",
-    "version": "0.2.7",
-    "description": "A \"Hello world\" program is a computer program that outputs \"Hello World\" (or some variant) on a display device",
+    "version": "10.1.0",
+    "description": "Virtual homee API for ESP32/ESP8266",
     "keywords": "homee, vhih, virtual homee",
     "build":
     {
@@ -10,7 +10,7 @@
     "repository":
     {
       "type": "git",
-      "url": "https://github.com/DanielKnoop/homee-api-esp32.git"
+      "url": "https://github.com/Oxi75/homee-api-esp32.git"
     },
     "authors":
     [
@@ -19,24 +19,38 @@
         "email": "code@knoop.in",
         "url": "https://github.com/DanielKnoop/homee-api-esp32",
         "maintainer": true
+      },
+     {
+        "name": "Andreas",
+        "email": "",
+        "url": "https://github.com/Oxi75/homee-api-esp32",
+        "maintainer": true
       }
     ],
     "license": "MIT",
-    "homepage": "https://github.com/DanielKnoop/homee-api-esp32",
+    "homepage": "https://github.com/Oxi75/homee-api-esp32",
     "dependencies": 
     [
       {
         "owner": "bblanchon",
         "name": "ArduinoJson",
-        "version": "^6.17.3"
+        "version": "^7.3.1"
       },
       {
-        "name": "ESPAsyncWebServer",
-        "version": "https://github.com/DanielKnoop/ESPAsyncWebServer.git#1.2.7"
+        "owner": "ESP32Async", 
+        "name": "ESPAsyncWebServer", 
+        "version": "^3.7.2"
       },
       {
-        "name": "ESPAsyncUDP",
-        "version": "https://github.com/DanielKnoop/ESPAsyncUDP.git",
+        "owner": "ESP32Async", 
+        "name": "AsyncTCP", 
+        "version": "^3.3.6",
+        "platforms": ["espressif32"]
+      },
+      {
+        "owner": "ESP32Async", 
+        "name": "ESPAsyncTCP",
+        "version": "^3.1.5",
         "platforms": ["espressif8266"]
       }
     ],

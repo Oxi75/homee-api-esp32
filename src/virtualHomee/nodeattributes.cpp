@@ -26,7 +26,6 @@ void nodeAttributes::GetJSONObject(JsonObject doc)
 void nodeAttributes::setName(String s)
 {
   this->name = s;
-
   return;  
 }
 
@@ -47,6 +46,8 @@ double_t nodeAttributes::getCurrentValue()
 
 size_t nodeAttributes::size()
 {
+    // In ArduinoJson 7 ist die genaue Byte-Berechnung nicht mehr zwingend für die Reservierung nötig,
+    // da der Speicher elastisch ist. Wir behalten es als Richtwert.
     return 350 + this->name.length() + this->data.length() + this->unit.length();
 }
 

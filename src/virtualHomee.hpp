@@ -1,11 +1,11 @@
 #pragma once
 
-#define ARDUINOJSON_POSITIVE_EXPONENTIATION_THRESHOLD 1e9
+// ArduinoJson 7 benötigt das Threshold Macro nicht mehr
 
 #if defined(ESP32)
 #include <WiFi.h>
 #include <AsyncTCP.h>
-#include <AsyncUDP.h>
+#include <AsyncUDP.h>    // <--- KORREKTUR: Standard ESP32 AsyncUDP nutzen
 #elif defined(ESP8266)
 #include <ESP8266WiFi.h>
 #include <ESPAsyncTCP.h>
@@ -40,7 +40,10 @@ private:
     nodeAttributes* getAttributeWithId(uint32_t id);
     String getUrlParameterValue(const String& url,const String& parameterName);
     String gethomeeId();
-    void sendWSMessage(AsyncWebSocketJsonBuffer * jsonBuffer, AsyncWebSocketClient *client);
+    
+    // Geändert: Nimmt jetzt ein JsonDocument statt Buffer
+    void sendWSMessage(JsonDocument& doc, AsyncWebSocketClient *client);
+    
     size_t numberOfWSClients = 0;
     void clientConnected();
     void clientDisconnected();
