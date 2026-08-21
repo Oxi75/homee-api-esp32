@@ -7,9 +7,7 @@ die Versionierung an [SemVer](https://semver.org/lang/de/).
 ## [10.1.0] - 2026-08-10
 
 Erstes offizielles, getaggtes Release dieses Forks (`Oxi75/homee-api-esp32`, ausgehend von
-`DanielKnoop/homee-api-esp32`). Da bisher nie ein Release veröffentlicht wurde, fasst dieser
-Eintrag die wesentlichen Änderungen seit Beginn der eigenen Weiterentwicklung zusammen,
-statt jeden einzelnen Commit aufzuführen.
+`DanielKnoop/homee-api-esp32` v0.2.7). 
 
 **Zur Versionsnummer:** Der Sprung auf `10.1.0` (statt Fortführung der ursprünglichen
 0.x-Zählung) dient ausschließlich dazu, ausreichend Abstand zur Versionsnummer des
